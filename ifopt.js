@@ -1,5 +1,10 @@
 let ifopt = {
 
+    // @TODO: Make arg validation of functions
+
+    /**
+     * @var {Object} colors   Default Color of ifopt.
+     */
     colors: {
         Reset: "\x1b[0m",
         Bright: "\x1b[1m",
@@ -32,46 +37,129 @@ let ifopt = {
         }
     },
 
+    /**
+     * @var {String} separator   Default separator for arguments.
+     */
     separator: ",",
 
+    /**
+     * @var {String} shortopt   Memorized short options.
+     */
     shortopt: "",
 
+    /**
+     * @var {Array} longopt   Memorized list of long options.
+     */
     longopt: [],
 
+    /**
+     * @var {Array} implicits   Memorized list of property name of implicit
+     *                          arguments.
+     */
     implicits: [],
 
-    implicitsRefs: null,
+    /**
+     * @var {Object} implicitRefs   Memorized of object reference to bridge
+     *                              value of implicit arguments.
+     */
+    implicitRefs: null,
 
-    setOpts: function (sopt, lopt, implicits, implicitRefs) {
+    /**
+     * Set options to parse without parsing them.
+     *
+     * @param {String} sopt          Short Options
+     * @param {Array}  lopt          Long Options
+     * @param {Array}  implicitNames (Optional) Name of property as implicit
+     *                               argument
+     * @param {Object} implicitRefs  (Optional) Object reference to brigde with
+     *                               caller
+     *
+     * @return {boolean}
+     */
+    setOpts: function (
+        sopt,
+        lopt,
+        implicitNames = [],
+        implicitRefs = {}
+        ) {
         ifopt.setShortOpt(sopt);
         ifopt.setLongOpt(lopt);
+        ifopt.setImplicitOpt(implicitNames, implicitRefs);
+
+        return true;
     },
 
-    //@TODO arg validation + jsdoc
+    /**
+     * Set the short options for the instance.
+     *
+     * @param {String} sopt  Provided short options string.
+     *
+     * @return {boolean}
+     */
     setShortOpt: function (sopt) {
         ifopt.shortopt = sopt;
 
         return true;
     },
 
-    //@TODO arg validation + jsdoc
+    /**
+     * Set the long options for the instance.
+     *
+     * @param {Array} lopt   Provided long options list.
+     *
+     * @return {boolean}
+     */
     setLongOpt: function (lopt) {
         ifopt.longopt = lopt;
 
         return true;
     },
 
-    //@TODO arg validation + jsdoc
-    setSeparator: function (sep) {
-        ifopt.separator = sep;
+    /**
+     * Set the implicit argument of the program (name and ref object).
+     *
+     * @param {Array} implicitNames   Name of properties of ref object.
+     * @param {Object} implicitRefs   Object Reference.
+     *
+     * @return {boolean}
+     */
+    setImplicitOpt: function (implicitNames, implicitRefs) {
+        ifopt.implicits = implicitNames;
+        ifopt.implicitRefs = implicitRefs;
+
+        return true;
     },
 
+    /**
+     * Set the separator to split an option.
+     *
+     * @param {String} sep  The separator char.
+     *
+     * @return {boolean}
+     */
+    setSeparator: function (sep) {
+        ifopt.separator = sep;
+
+        return true;
+    },
+
+    /**
+     * Get the current color object configuration.
+     *
+     * @return {Object|{fg: {Red: string, Cyan: string, White: string, Yellow: string, Blue: string, Magenta: string, Black: string, Crimson: string, Green: string}, Reverse: string, bg: {Red: string, Cyan: string, White: string, Yellow: string, Blue: string, Magenta: string, Black: string, Crimson: string, Green: string}, Blink: string, Dim: string, Hidden: string, Underscore: string, Reset: string, Bright: string}}
+     */
     getColors: function () {
         return ifopt.colors;
     },
 
+    /**
+     * Set the new object color configuration.
+     * Use getColors first, perform modification and update with this method.
+     *
+     * @param {Object|{fg: {Red: string, Cyan: string, White: string, Yellow: string, Blue: string, Magenta: string, Black: string, Crimson: string, Green: string}, Reverse: string, bg: {Red: string, Cyan: string, White: string, Yellow: string, Blue: string, Magenta: string, Black: string, Crimson: string, Green: string}, Blink: string, Dim: string, Hidden: string, Underscore: string, Reset: string, Bright: string}} colors
+     */
     setColors: function (colors) {
-
+        ifopt.colors = colors;
     },
 
     /**
