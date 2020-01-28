@@ -23,11 +23,11 @@ let ifopt = {
             Cyan: "\x1b[36m",
             White: "\x1b[37m",
             Crimson: "\x1b[38m",
-            Success: colors.fg.Green,
-            Error: colors.fg.Red,
-            Info: colors.fg.Cyan,
-            Warning: colors.fg.Yellow,
-            Debug: colors.fg.Crimson
+            Success: "\x1b[32m",
+            Error: "\x1b[31m",
+            Info: "\x1b[36m",
+            Warning: "\x1b[33m",
+            Debug: "\x1b[38m"
         },
         bg: {
             Black: "\x1b[40m",
@@ -39,11 +39,11 @@ let ifopt = {
             Cyan: "\x1b[46m",
             White: "\x1b[47m",
             Crimson: "\x1b[48m",
-            Success: colors.bg.Green,
-            Error: colors.bg.Red,
-            Info: colors.bg.Cyan,
-            Warning: colors.bg.Yellow,
-            Debug: colors.bg.Crimson
+            Success: "\x1b[42m",
+            Error: "\x1b[41m",
+            Info: "\x1b[46m",
+            Warning: "\x1b[43m",
+            Debug: "\x1b[48m"
         }
     },
 
@@ -91,7 +91,7 @@ let ifopt = {
         lopt,
         implicitNames = [],
         implicitRefs = {}
-        ) {
+    ) {
         ifopt.setShortOpt(sopt);
         ifopt.setLongOpt(lopt);
         ifopt.setImplicitOpt(implicitNames, implicitRefs);
