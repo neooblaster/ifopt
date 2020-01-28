@@ -22,7 +22,12 @@ let ifopt = {
             Magenta: "\x1b[35m",
             Cyan: "\x1b[36m",
             White: "\x1b[37m",
-            Crimson: "\x1b[38m"
+            Crimson: "\x1b[38m",
+            Success: colors.fg.Green,
+            Error: colors.fg.Red,
+            Info: colors.fg.Cyan,
+            Warning: colors.fg.Yellow,
+            Debug: colors.fg.Crimson
         },
         bg: {
             Black: "\x1b[40m",
@@ -33,7 +38,12 @@ let ifopt = {
             Magenta: "\x1b[45m",
             Cyan: "\x1b[46m",
             White: "\x1b[47m",
-            Crimson: "\x1b[48m"
+            Crimson: "\x1b[48m",
+            Success: colors.bg.Green,
+            Error: colors.bg.Red,
+            Info: colors.bg.Cyan,
+            Warning: colors.bg.Yellow,
+            Debug: colors.bg.Crimson
         }
     },
 
@@ -153,13 +163,45 @@ let ifopt = {
     },
 
     /**
-     * Set the new object color configuration.
+     * Set the new object colors configuration.
      * Use getColors first, perform modification and update with this method.
      *
      * @param {Object|{fg: {Red: string, Cyan: string, White: string, Yellow: string, Blue: string, Magenta: string, Black: string, Crimson: string, Green: string}, Reverse: string, bg: {Red: string, Cyan: string, White: string, Yellow: string, Blue: string, Magenta: string, Black: string, Crimson: string, Green: string}, Blink: string, Dim: string, Hidden: string, Underscore: string, Reset: string, Bright: string}} colors
      */
     setColors: function (colors) {
         ifopt.colors = colors;
+    },
+
+    /**
+     * Set/Update a color specifying its property path
+     *
+     * @param {String} colorPty  The object property path (fg.Yellow)
+     * @param {String} color     Bash Color Instruction
+     *
+     * @return {boolean}
+     */
+    setColor: function (colorPty, color) {
+        let newColor = ifopt.colors;
+        let newColorRef = newColor;
+
+        colorPty = colorPty.split(".");
+
+        for (let i = 0; i < colorPty.length; i++) {
+            let pty = colorPty[i];
+
+            if (i === (colorPty.length - 1)) {
+                newColorRef[pty] = color;
+            } else{
+                if (!newColorRef[pty]) {
+                    newColorRef[pty] = {};
+                }
+                newColorRef = newColorRef[pty];
+            }
+        }
+
+        Object.assign(ifopt.colors, newColor);
+
+        return true;
     },
 
     /**
@@ -302,11 +344,13 @@ let ifopt = {
         // 1 = Error
         // 2 = Warn
         // 3 = Info
+        // 4 = Debug
         let levels = [
-            {color: "Green", name: "SUCCESS", return: 0},
-            {color: "Red", name: "ERROR", return: 1},
-            {color: "Yellow", name: "WARNING", return: 0},
-            {color: "Cyan", name: "INFO", return: 0},
+            {color: "Success", name: "SUCCESS", return: 0},
+            {color: "Error", name: "ERROR", return: 1},
+            {color: "Warning", name: "WARNING", return: 0},
+            {color: "Info", name: "INFO", return: 0},
+            {color: "Debug", name: "DEBUG", return: 0},
         ];
 
         // Replace Placeholders.
