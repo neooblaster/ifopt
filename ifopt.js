@@ -6,6 +6,7 @@ let ifopt = {
      * @var {Object} colors   Default Color of ifopt.
      */
     colors: {
+        Restore: "[xlb]",
         Reset: "\x1b[0m",
         Bright: "\x1b[1m",
         Dim: "\x1b[2m",
@@ -27,7 +28,7 @@ let ifopt = {
             Error: "\x1b[31m",
             Info: "\x1b[36m",
             Warning: "\x1b[33m",
-            Debug: "\x1b[38m"
+            Debug: "\x1b[38;5;208m"
         },
         bg: {
             Black: "\x1b[40m",
@@ -43,7 +44,7 @@ let ifopt = {
             Error: "\x1b[41m",
             Info: "\x1b[46m",
             Warning: "\x1b[43m",
-            Debug: "\x1b[48m"
+            Debug: "\x1b[38;5;208m"
         }
     },
 
@@ -160,6 +161,10 @@ let ifopt = {
      */
     getColors: function () {
         return ifopt.colors;
+    },
+
+    getColor: function (colorPty) {
+
     },
 
     /**
@@ -358,6 +363,8 @@ let ifopt = {
         args.map(function (arg) {
             argi++;
             arg = ifopt.colors.fg.Yellow + arg + ifopt.colors.Reset;
+            arg = arg.replace(ifopt.colors.Restore, ifopt.colors.fg.Yellow);
+
             if (/%[1-9]+\$s/.test(message)) {
                 let regexp = new RegExp(`%${argi}\\$s`);
                 message = message.replace(regexp, arg)
@@ -372,7 +379,7 @@ let ifopt = {
             levels[level].name +
             ifopt.colors.Reset +
             " ] : " +
-            message
+            message.replace(ifopt.colors.Restore, ifopt.colors.Reset)
         );
 
         return levels[level].return;
