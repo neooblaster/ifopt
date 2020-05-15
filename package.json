@@ -5,8 +5,5 @@
     "author": {
         "name": "Nicolas DUPRE"
     },
-    "main": "ifopt.js",
-    "publishConfig": {
-        "registry": "https://npm.pkg.github.com/"
-    }
+    "main": "ifopt.js"
 }

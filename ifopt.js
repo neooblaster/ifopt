@@ -363,7 +363,7 @@ let ifopt = {
         args.map(function (arg) {
             argi++;
             arg = ifopt.colors.fg.Yellow + arg + ifopt.colors.Reset;
-            arg = arg.replace(ifopt.colors.Restore, ifopt.colors.fg.Yellow);
+            arg = arg.split(ifopt.colors.Restore).join(ifopt.colors.fg.Yellow);
 
             if (/%[1-9]+\$s/.test(message)) {
                 let regexp = new RegExp(`%${argi}\\$s`);
@@ -379,7 +379,7 @@ let ifopt = {
             levels[level].name +
             ifopt.colors.Reset +
             " ] : " +
-            message.replace(ifopt.colors.Restore, ifopt.colors.Reset)
+            message.split(ifopt.colors.Restore).join(ifopt.colors.Reset)
         );
 
         return levels[level].return;

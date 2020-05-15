@@ -4,7 +4,7 @@
 const opt = require('../ifopt');
 
 // "Restore" Color Instruction :
-let string = `I want to put the ${opt.colors.fg.Magenta}keyword${opt.colors.Restore} is another color`;
+let string = `I want to put the ${opt.colors.fg.Magenta}keyword${opt.colors.Restore} and ${opt.colors.fg.Magenta}keyword2${opt.colors.Restore} is another color`;
 
 // Use as message
 opt.log(string, 0, []);
