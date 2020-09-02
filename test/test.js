@@ -52,6 +52,11 @@ let OPTS = opt.getopt(
 
 console.log(OPTS, IMPLICITS);
 
-// Get Option - Method 1
+// Get Option values using Short and Long
+let input1 = opt.getOptValue('i');
+let input2 = opt.getOptValue(["input", "i"]);
+
+console.log(input1)
+console.log(input2)
 
 

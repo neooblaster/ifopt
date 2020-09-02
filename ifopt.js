@@ -458,6 +458,29 @@ let ifopt = {
     },
 
     /**
+     * Return the value of the first options specified in the array.
+     *
+     * @param {String|Array} opts  Options to get value
+     *
+     * @return {[*]|boolean} The returned value or false if not found.
+     */
+    getOptValue: function (opts) {
+        let options = ifopt.getopt();
+
+        if (!(opts instanceof Array)) {
+            opts = [opts]
+        }
+
+        for (let i = 0; i < opts.length; i++) {
+            if (options[opts[i]]) {
+                return options[opts[i]].val;
+            }
+        }
+
+        return false;
+    },
+
+    /**
      * Aggregate values of specified options to list of value (merge shortopt and longopt)
      *
      * @param {Array}  optpool       Program options data.
