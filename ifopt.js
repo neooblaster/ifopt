@@ -3,6 +3,11 @@ let ifopt = {
     // @TODO: Make arg validation of functions
 
     /**
+     * @var {Boolean} colorize   Indicating to not use color in log ouputs.
+     */
+    colorize: true,
+
+    /**
      * @var {Object} colors   Default Color of ifopt.
      */
     colors: {
@@ -206,6 +211,54 @@ let ifopt = {
 
         Object.assign(ifopt.colors, newColor);
 
+        return true;
+    },
+
+    /**
+     * Neutralize colors controls to blank.
+     * If called without parameter, the defined color for ifopt
+     * instance are neutralize. You can passe your colors object definition
+     * (copy from ifopt one using getColors()).
+     *
+     * @param {Object} colors   Colors object definition (optional)
+     *
+     * @return {*}
+     */
+    removeColor: function (colors = ifopt.colors) {
+        for (let pty in colors) {
+            if (colors.hasOwnProperty(pty)) {
+                if (typeof colors[pty] === 'string') {
+                    colors[pty] = '';
+                }
+                if (colors[pty] instanceof Object) {
+                    colors[pty] = removeColor(colors[pty]);
+                }
+            }
+        }
+
+        return colors;
+    },
+
+    /**
+     * Set log message will not use colors.
+     *
+     * @return {boolean}
+     */
+    noColor: function () {
+        ifopt.colorize = false;
+        return true;
+    },
+
+    /**
+     * Set if log message use colors.
+     * If called without parameters, meaning true, use colors.
+     *
+     * @param  {boolean} usage   Use color (or not (false))
+     *
+     * @return {boolean}
+     */
+    useColor: function (usage = true) {
+        ifopt.colorize = (usage);
         return true;
     },
 
