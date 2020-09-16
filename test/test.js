@@ -59,4 +59,17 @@ let input2 = opt.getOptValue(["input", "i"]);
 console.log(input1)
 console.log(input2)
 
+let log = opt.log;
+
+log("The following error %s must be in color", 1, ['colorize=true']);
+opt.noColor();
+log("The following error %s must not be in color", 1, ['colorize=false']);
+opt.useColor();
+log("The following error %s must be in color", 1, ['colorize=true']);
+opt.useColor(false);
+log("The following error %s must not be in color", 1, ['colorize=false']);
+opt.useColor(true);
+log("The following error %s must be in color", 1, ['colorize=true']);
+
+
 

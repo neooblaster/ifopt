@@ -216,7 +216,7 @@ let ifopt = {
 
     /**
      * Neutralize colors controls to blank.
-     * If called without parameter, the defined color for ifopt
+     * If called without parameter, the defined colors for ifopt
      * instance are neutralize. You can passe your colors object definition
      * (copy from ifopt one using getColors()).
      *
@@ -225,18 +225,20 @@ let ifopt = {
      * @return {*}
      */
     removeColor: function (colors = ifopt.colors) {
-        for (let pty in colors) {
-            if (colors.hasOwnProperty(pty)) {
-                if (typeof colors[pty] === 'string') {
-                    colors[pty] = '';
+        let removed = Object.assign({}, colors);
+
+        for (let pty in removed) {
+            if (removed.hasOwnProperty(pty)) {
+                if (typeof removed[pty] === 'string') {
+                    removed[pty] = '';
                 }
-                if (colors[pty] instanceof Object) {
-                    colors[pty] = removeColor(colors[pty]);
+                if (removed[pty] instanceof Object) {
+                    removed[pty] = ifopt.removeColor(removed[pty]);
                 }
             }
         }
 
-        return colors;
+        return removed;
     },
 
     /**
@@ -397,7 +399,7 @@ let ifopt = {
      * @param level   Niveau de message. 0=OK,1=KO,2=WARN.
      * @param args    Arguments which will replace placeholder in message.
      */
-    log: function (message, level = 0, args = []){
+    log: function (message = '', level = 0, args = []){
         // 0 = Success
         // 1 = Error
         // 2 = Warn
@@ -411,12 +413,16 @@ let ifopt = {
             {color: "Debug", name: "DEBUG", return: 0},
         ];
 
+        // console.log(ifopt.colors)
+        let colors = (ifopt.colorize) ? ifopt.colors : ifopt.removeColor();
+        // console.log(ifopt.colors)
+
         // Replace Placeholders.
         let argi = 0;
         args.map(function (arg) {
             argi++;
-            arg = ifopt.colors.fg.Yellow + arg + ifopt.colors.Reset;
-            arg = arg.split(ifopt.colors.Restore).join(ifopt.colors.fg.Yellow);
+            arg = colors.fg.Yellow + arg + colors.Reset;
+            arg = arg.split(colors.Restore).join(colors.fg.Yellow);
 
             if (/%[1-9]+\$s/.test(message)) {
                 let regexp = new RegExp(`%${argi}\\$s`);
@@ -428,11 +434,11 @@ let ifopt = {
 
         console.log(
             "[ " +
-            ifopt.colors.fg[levels[level].color] +
+            colors.fg[levels[level].color] +
             levels[level].name +
-            ifopt.colors.Reset +
+            colors.Reset +
             " ] : " +
-            message.split(ifopt.colors.Restore).join(ifopt.colors.Reset)
+            message.split(colors.Restore).join(colors.Reset)
         );
 
         return levels[level].return;
