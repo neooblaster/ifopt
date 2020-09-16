@@ -423,3 +423,4 @@ opt.useColor(true);
 
 
 #### Update one color (`setColor()`)
+
