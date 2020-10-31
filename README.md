@@ -120,7 +120,7 @@ will return for ``parsedOption`` :
 myCommand -d=test -o --unwantedoption
 ````
 
-````json
+````plaintext
 {
   d: { arg: '-d=test', opt: 'd', val: 'test' },
   o: { arg: '-o', opt: 'o', val: null }
@@ -146,7 +146,7 @@ let parsedOption = opt.getopt();
 
 Which will produce the same result :
 
-````json
+````plaintext
 {
   d: { arg: '-d=test', opt: 'd', val: 'test' },
   o: { arg: '-o', opt: 'o', val: null }
@@ -380,6 +380,92 @@ The herebefore statement will log the message :
 ````
 [ ERROR ] : File <yourFile> not found
 ````
+
+
+
+### Smart Loging for your VERBOSE & DEBUG modes
+
+To increase your code readability by avoiding following code,
+you can configure ``log()`` behavior creating display rules using
+method 
+``setLogLevel(String groupName [, Boolean groupEnabled [, Array levels]])``.
+
+````js
+const opt = require('ifopt');
+const log = opt.log;
+
+let VERBOSE = false;
+let DEBUG   = false;
+
+
+// Declaration of option which will be manage by ifopt :
+const myOptions = {
+    shortopt: "Dv",
+    longopt: [
+        "debug",
+        "verbose"
+    ]
+};
+
+let parsedOption = opt.getopt(
+    myOptions.shortopt,
+    myOptions.longopt
+);
+
+// Set to true when option 'verbose' is used
+if (opt.isOption(['verbose', 'v'])) VERBOSE = true;
+// Set to true when option 'debug' is used
+if (opt.isOption(['debug', 'D'])) DEBUG = true;
+
+
+if(VERBOSE){
+    // level 3 = INFO
+    log("Your INFO message here with params %s", 3, ['myParam']);
+}
+if(DEBUG){
+    // level 4 = DEBUG
+    log("Your DEBUG message here with params %s", 4, ['myParam'])
+}
+````
+
+Herebefore code can be rewrite with :
+
+```js
+const opt = require('ifopt');
+const log = opt.log;
+
+// Declaration of option which will be manage by ifopt :
+const myOptions = {
+    shortopt: "Dv",
+    longopt: [
+        "debug",
+        "verbose"
+    ]
+}
+
+let parsedOption = opt.getopt(
+    myOptions.shortopt,
+    myOptions.longopt
+);
+
+// All "INFO" will not displayed by default
+// (only if log() argument ignoreSmartLog is true)
+opt.setLogLevel('VERBOSE', false, [3]);
+
+// All "DEBUG" will not displayed by default
+// (only if log() argument ignoreSmartLog is true)
+opt.setLogLevel('DEBUG', false, [4]);
+
+// Set to true when option 'verbose' is used
+if (opt.isOption(['verbose', 'v'])) opt.setLogLevel('VERBOSE', true);
+// Set to true when option 'debug' is used
+if (opt.isOption(['debug', 'D'])) opt.setLogLevel('DEBUG', true);
+
+// Now you can simply use everywhere the following call :
+log("Your INFO message here with params %s", 3, ['myParam']);
+log("Your DEBUG message here with params %s", 4, ['myParam']);
+```
+
 
 
 

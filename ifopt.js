@@ -80,6 +80,12 @@ let ifopt = {
      */
     implicitRefs: null,
 
+    smartLoging: {
+
+    },
+
+    selfDebug: false,
+
     /**
      * Set options to parse without parsing them.
      *
@@ -395,11 +401,14 @@ let ifopt = {
     /**
      * Afficher un message dans le stream.
      *
-     * @param message Message à afficher.
-     * @param level   Niveau de message. 0=OK,1=KO,2=WARN.
-     * @param args    Arguments which will replace placeholder in message.
+     * @param message         Message à afficher.
+     * @param level           Niveau de message. 0=OK,1=KO,2=WARN.
+     * @param args            Arguments which will replace placeholder in message.
+     * @param ignoreSmartLog  Ignore smartLog rules.
+     *
+     * @return {number}
      */
-    log: function (message = '', level = 0, args = []){
+    log: function (message = '', level = 0, args = [], ignoreSmartLog = false){
         // 0 = Success
         // 1 = Error
         // 2 = Warn
@@ -412,6 +421,7 @@ let ifopt = {
             {color: "Info", name: "INFO", return: 0},
             {color: "Debug", name: "DEBUG", return: 0},
         ];
+        let display = true;
 
         // console.log(ifopt.colors)
         let colors = (ifopt.colorize) ? ifopt.colors : ifopt.removeColor();
@@ -432,16 +442,85 @@ let ifopt = {
             }
         });
 
-        console.log(
-            "[ " +
-            colors.fg[levels[level].color] +
-            levels[level].name +
-            colors.Reset +
-            " ] : " +
-            message.split(colors.Restore).join(colors.Reset)
-        );
+        // Check "smartLogin"
+        for (let group in ifopt.smartLoging) {
+            let enabled = ifopt.smartLoging[group].enabled;
+            let levels  = ifopt.smartLoging[group].levels;
+
+            if (levels.lastIndexOf(level) >= 0) {
+                display = enabled;
+                break;
+            }
+        }
+
+        if (display || ignoreSmartLog) {
+            console.log(
+                "[ " +
+                colors.fg[levels[level].color] +
+                levels[level].name +
+                colors.Reset +
+                " ] : " +
+                message.split(colors.Restore).join(colors.Reset)
+            );
+        }
 
         return levels[level].return;
+    },
+
+    /**
+     * Set display behavior for log() function using group, enabling boolean
+     * for specified levels
+     *
+     * @param groupName     Levels groupname to handle them
+     * @param groupEnabled  If false, levels will not display when calling log()
+     * @param levels        Levels of the group
+     *
+     * @return {boolean}
+     */
+    setLogLevel: function (groupName, groupEnabled = false, levels = []) {
+        if (!(typeof groupName === 'string')) {
+            ifopt.log(
+                "%s is not string",
+                1,
+                ["setLogLevel() groupName"]
+            );
+            return false;
+        }
+
+        if (ifopt.selfDebug) {
+            ifopt.log("groupName : %s", 4, [groupName])
+            ifopt.log("groupEnabled '%s'(%s) => %s", 4, [
+                groupEnabled, typeof groupEnabled, !!(groupEnabled)
+            ]);
+        }
+
+        groupEnabled = !!(groupEnabled);
+
+        levels = (typeof levels !== 'object') ? [levels] : levels;
+
+        if (ifopt.selfDebug) {
+            ifopt.log("levels :", 4);
+            console.log(levels);
+        }
+
+        if (ifopt.smartLoging[groupName]){
+            ifopt.smartLoging[groupName].enabled = groupEnabled;
+            if (levels.length > 0) {
+                ifopt.smartLoging[groupName].levels = levels;
+            }
+        } else {
+            ifopt.smartLoging[groupName] = {
+                enabled: groupEnabled,
+                levels: levels
+            };
+        }
+
+        if (ifopt.selfDebug) {
+            ifopt.log("smartLoging :", 4);
+            console.dir(ifopt.smartLoging, {depth: null})
+        }
+
+        return true;
     },
 
     /**
