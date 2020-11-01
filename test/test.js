@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+const cdir = function (el) {
+    console.dir(el, {depth: null})
+};
+const clog = console.log;
 
 // From 'node_modules'
 const opt = require('../ifopt');
@@ -18,7 +22,7 @@ opt.log('My sentense is %s containing keyword', 0, [string])
 let IMPLICITS = {
     INPUT: null,
     OUTPUT: null
-}
+};
 let OPTS = opt.getopt(
     // Short Options
     "vdi::o::",
@@ -57,8 +61,8 @@ console.log(OPTS, IMPLICITS);
 let input1 = opt.getOptValue('i');
 let input2 = opt.getOptValue(["input", "i"]);
 
-console.log(input1)
-console.log(input2)
+console.log(input1);
+console.log(input2);
 
 let log = opt.log;
 
@@ -125,6 +129,19 @@ log("Message with level 3 (INFO)", 3, []);
 log("Message with level 4 (DEBUG)", 4, []);
 
 
+/**
+ * test addtions v1.6.0
+ * - Creation of own log levels
+ */
+opt.setColor('fg.Verbose', '\x1b[35m');
+opt.createLogLevel(5, 'VERBOSE_2', 'fg.Verbose', 0);
+log("Super Verbose message in %s", 5, ['magenta']);
+// switching off Verbose_2
+opt.setLogLevel('VERBOSE_2', false, [5]);
+log("Super Verbose message in %s switch off", 5, ['magenta']);
+// switching on Verbose_2
+opt.setLogLevel('VERBOSE_2', true);
+log("Super Verbose message in %s switch on", 5, ['magenta']);
 
 
 

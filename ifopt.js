@@ -1,3 +1,5 @@
+require('nativejs-proto-extensions');
+
 let ifopt = {
 
     // @TODO: Make arg validation of functions
@@ -80,10 +82,23 @@ let ifopt = {
      */
     implicitRefs: null,
 
-    smartLoging: {
+    /**
+     * @var {Object} levels   Logging levels
+     */
+    levels: {
 
     },
 
+    /**
+     * @var {Object} smartLogging   Log level rule to manage display.
+     */
+    smartLogging: {
+
+    },
+
+    /**
+     * @var {boolean} selfDebug   To display debug message of ifopt.
+     */
     selfDebug: false,
 
     /**
@@ -174,8 +189,15 @@ let ifopt = {
         return ifopt.colors;
     },
 
+    /**
+     * Return the color string for specified path
+     *
+     * @param colorPty   Path of the color in property ifopt.colors.
+     *
+     * @return {*}
+     */
     getColor: function (colorPty) {
-
+        return ifopt.colors.getValueForPath(colorPty);
     },
 
     /**
@@ -409,23 +431,9 @@ let ifopt = {
      * @return {number}
      */
     log: function (message = '', level = 0, args = [], ignoreSmartLog = false){
-        // 0 = Success
-        // 1 = Error
-        // 2 = Warn
-        // 3 = Info
-        // 4 = Debug
-        let levels = [
-            {color: "Success", name: "SUCCESS", return: 0},
-            {color: "Error", name: "ERROR", return: 1},
-            {color: "Warning", name: "WARNING", return: 0},
-            {color: "Info", name: "INFO", return: 0},
-            {color: "Debug", name: "DEBUG", return: 0},
-        ];
+        let lvlConf = ifopt.levels[level];
         let display = true;
-
-        // console.log(ifopt.colors)
         let colors = (ifopt.colorize) ? ifopt.colors : ifopt.removeColor();
-        // console.log(ifopt.colors)
 
         // Replace Placeholders.
         let argi = 0;
@@ -443,9 +451,10 @@ let ifopt = {
         });
 
         // Check "smartLogin"
-        for (let group in ifopt.smartLoging) {
-            let enabled = ifopt.smartLoging[group].enabled;
-            let levels  = ifopt.smartLoging[group].levels;
+        for (let group in ifopt.smartLogging) {
+            if (group === 'getValueForPath') continue;
+            let enabled = ifopt.smartLogging[group].enabled;
+            let levels  = ifopt.smartLogging[group].levels;
 
             if (levels.lastIndexOf(level) >= 0) {
                 display = enabled;
@@ -456,15 +465,41 @@ let ifopt = {
         if (display || ignoreSmartLog) {
             console.log(
                 "[ " +
-                colors.fg[levels[level].color] +
-                levels[level].name +
+                lvlConf.color +
+                lvlConf.name +
                 colors.Reset +
                 " ] : " +
                 message.split(colors.Restore).join(colors.Reset)
             );
         }
 
-        return levels[level].return;
+        return lvlConf.return;
+    },
+
+    /**
+     * Create logging level for STDx. Will display specified name and color.
+     *
+     * @param {number} level     Level number (must be unique)
+     * @param {string} name      Display logging name.
+     * @param {string} color     Path to the color of ifopt.colors (check ifopt.getColors())
+     * @param {number} lreturn   Return code for the logging level
+     *
+     * @return {boolean}
+     */
+    createLogLevel: function (level, name, color = 'Reset', lreturn = 0) {
+        // Check if level does not exist.
+        if (ifopt.levels.hasOwnProperty(level)) {
+            let levelName = ifopt.getValueForPath(`levels.${level}.name`);
+            ifopt.log("Log level %s already exist (name: %s). Logging level will be overwrited.", 2, [level, levelName]);
+        }
+
+        ifopt.levels[level] = {
+            name: name,
+            color: ifopt.colors.getValueForPath(color),
+            return: lreturn
+        };
+
+        return true;
     },
 
     /**
@@ -503,21 +538,21 @@ let ifopt = {
             console.log(levels);
         }
 
-        if (ifopt.smartLoging[groupName]){
-            ifopt.smartLoging[groupName].enabled = groupEnabled;
+        if (ifopt.smartLogging[groupName]){
+            ifopt.smartLogging[groupName].enabled = groupEnabled;
             if (levels.length > 0) {
-                ifopt.smartLoging[groupName].levels = levels;
+                ifopt.smartLogging[groupName].levels = levels;
             }
         } else {
-            ifopt.smartLoging[groupName] = {
+            ifopt.smartLogging[groupName] = {
                 enabled: groupEnabled,
                 levels: levels
             };
         }
 
         if (ifopt.selfDebug) {
-            ifopt.log("smartLoging :", 4);
-            console.dir(ifopt.smartLoging, {depth: null})
+            ifopt.log("smartLogging :", 4);
+            console.dir(ifopt.smartLogging, {depth: null})
         }
 
         return true;
@@ -640,5 +675,15 @@ let ifopt = {
     }
 
 };
+
+/**
+ * Initialization
+ */
+// Set own logging levels
+ifopt.createLogLevel(0, 'SUCCESS', 'fg.Success', 0);
+ifopt.createLogLevel(1, 'ERROR', 'fg.Error', 1);
+ifopt.createLogLevel(2, 'WARNING', 'fg.Warning', 0);
+ifopt.createLogLevel(3, 'INFO', 'fg.Info', 0);
+ifopt.createLogLevel(4, 'DEBUG', 'fg.Debug', 0);
 
 module.exports = ifopt;

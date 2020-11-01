@@ -366,7 +366,7 @@ like this in the console using colors :
 
 Below, the argument of method ``log`` :
  * String, message, Message to display.
- * Number, level,   Level of the message. 0=OK,1=KO,2=WARN.
+ * Number, level,   Level of the message. 0=SUCCESS,1=ERROR,2=WARNING,3=INFO,4=DEBUG.
  * Array,  args    Arguments which will replace placeholder (%s) in message.
 
 ````js
@@ -381,9 +381,19 @@ The herebefore statement will log the message :
 [ ERROR ] : File <yourFile> not found
 ````
 
+``ifopt`` have five default logging level which are following :
+
+| Level | Name    | Color  | Return Code |
+|:-----:|---------|--------|:-----------:|
+| 0     | SUCCESS | Green  | 0           |
+| 1     | ERROR   | Red    | 1           |
+| 2     | WARNING | Yellow | 0           |
+| 3     | INFO    | Teal   | 0           |
+| 4     | DEBUG   | Orange | 0           |
 
 
-### Smart Loging for your VERBOSE & DEBUG modes
+
+### Smart Logging for your VERBOSE & DEBUG modes
 
 To increase your code readability by avoiding following code,
 you can configure ``log()`` behavior creating display rules using
@@ -428,7 +438,7 @@ if(DEBUG){
 }
 ````
 
-Herebefore code can be rewrite with :
+Herebefore code can be rewrited with :
 
 ```js
 const opt = require('ifopt');
@@ -466,6 +476,85 @@ log("Your INFO message here with params %s", 3, ['myParam']);
 log("Your DEBUG message here with params %s", 4, ['myParam']);
 ```
 
+If you need to display a message which level number is under
+rule which currently is disabled, you can force the display like this :
+
+````js
+//---------------------------------------------------------▼▼▼▼--
+log("You disabled INFO message will alway display", 3, [], true);
+````
+
+
+
+### Create your own logging level
+
+``ifopt`` have five default logging level which are following :
+
+| Level | Name    | Color  | Return Code |
+|:-----:|---------|--------|:-----------:|
+| 0     | SUCCESS | Green  | 0           |
+| 1     | ERROR   | Red    | 1           |
+| 2     | WARNING | Yellow | 0           |
+| 3     | INFO    | Teal   | 0           |
+| 4     | DEBUG   | Orange | 0           |
+
+If you need more logging level or modify existing one,
+you can use the following method :
+
+````plaintext
+createLogLevel(number level, string name [, string color [,number lreturn]);
+````
+
+Please find below a complete example to handle three level of verbose mode.
+
+````js
+// cf : test/docs_009.js
+const opt = require('../ifopt');
+const log = opt.log;
+
+// Declaration of option which will be manage by ifopt :
+const myOptions = {
+    shortopt: "Dv",
+    longopt: [
+        "debug",
+        "v",
+        "vv",
+        "vvv"
+    ]
+};
+
+let parsedOption = opt.getopt(
+    myOptions.shortopt,
+    myOptions.longopt
+);
+
+// Create 3 Verbose level info message :
+opt.createLogLevel(5, 'INFO N-1', 'fg.Info', 0);
+opt.createLogLevel(6, 'INFO N-2', 'fg.Info', 0);
+opt.createLogLevel(7, 'INFO N-3', 'fg.Info', 0);
+
+// Set login level rule
+opt.setLogLevel('INFO_N-1', false, [5]);
+opt.setLogLevel('INFO_N-2', false, [6]);
+opt.setLogLevel('INFO_N-3', false, [7]);
+
+// Read options
+if (opt.isOption(['v', 'vv', 'vvv'])) {
+    opt.setLogLevel('INFO_N-1', true);
+}
+if (opt.isOption(['vv', 'vvv'])) {
+    opt.setLogLevel('INFO_N-2', true);
+}
+if (opt.isOption(['vvv'])) {
+    opt.setLogLevel('INFO_N-3', true);
+}
+
+
+log("Message always displayed", 3);
+log("Message only displayed with option %s, %s, %s or %s", 5, ['-v', '--v', '--vv', '--vvv']);
+log("Message only displayed with option %s or %s", 6, ['--vv', '--vvv']);
+log("Message only displayed with option %s", 7, ['--vvv']);
+````
 
 
 
