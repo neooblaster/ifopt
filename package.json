@@ -7,6 +7,6 @@
     },
     "main": "ifopt.js",
     "dependencies": {
-        "nativejs-proto-extensions": "^0.1.0"
+        "nativejs-proto-extensions": "^0.2.0"
     }
 }
